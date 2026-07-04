@@ -1,1 +1,188 @@
-Говно
+-- Простой вариант с задержкой 5 секунд после 27-й точки
+local points = {
+    {-1456, -161, -881},
+    {-1480, -140, -778},
+    {-1478, -106, -669},
+    {-1456, -70, -493},
+    {-1455, -58, -393},
+    {-1456, -57, -291},
+    {-1456, -57, -192},
+    {-1457, -57, -89},
+    {-1458, -58, 6},
+    {-1455, -57, 49},
+    {-1455, 32, 84},
+    {-1454, 90, 91},
+    {-1474, 160, 96},
+    {-1459, 215, 140},
+    {-1456, 214, 355},
+    {-1457, 214, 549},
+    {-1453, 335, 627},
+    {-1350, 359, 494},
+    {-1233, 328, 655},
+    {-1273, 351, 839},
+    {-1405, 372, 739},
+    {-1405, 484, 724},
+    {-1403, 532, 838},
+    {-1406, 532, 1049},
+    {-1406, 532, 1220},
+    {-1408, 532, 1446},
+    {-1431, 532, 1329}
+}
+
+local WAIT_AFTER_LAST = 5  -- 5 секунд после 27-й точки
+
+-- Останавливаем предыдущий скрипт
+if getgenv()._tp_cycle_active then
+    print("🔄 Stopping previous script...")
+    getgenv()._tp_cycle_running = false
+    getgenv()._tp_cycle_emergency = false
+    getgenv()._tp_cycle_waiting = false
+    if getgenv()._tp_cycle_connection then
+        getgenv()._tp_cycle_connection:Disconnect()
+        getgenv()._tp_cycle_connection = nil
+    end
+    print("✅ Previous script stopped")
+end
+
+-- Создаем глобальные переменные
+getgenv()._tp_cycle_active = true
+getgenv()._tp_cycle_running = false
+getgenv()._tp_cycle_emergency = false
+getgenv()._tp_cycle_waiting = false
+getgenv()._tp_cycle_i = 1
+getgenv()._tp_cycle_tick = 0
+getgenv()._tp_cycle_wait_start = 0
+getgenv()._tp_cycle_connection = nil
+getgenv()._tp_cycle_count = 0
+
+local function tpNext()
+    if getgenv()._tp_cycle_emergency then return end
+    
+    local p = points[getgenv()._tp_cycle_i]
+    local player = game.Players.LocalPlayer
+    if player and player.Character then
+        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = CFrame.new(p[1], p[2], p[3])
+            print("TP " .. getgenv()._tp_cycle_i .. "/" .. #points)
+        end
+    end
+    
+    getgenv()._tp_cycle_i = getgenv()._tp_cycle_i + 1
+    
+    -- Если дошли до конца (после 27-й точки)
+    if getgenv()._tp_cycle_i > #points then
+        getgenv()._tp_cycle_count = getgenv()._tp_cycle_count + 1
+        print("===== CYCLE #" .. getgenv()._tp_cycle_count .. " COMPLETED! =====")
+        print("⏳ Waiting " .. WAIT_AFTER_LAST .. " seconds...")
+        game:GetService("Chat"):Chat(game.Players.LocalPlayer.Character, "🔄 Cycle #" .. getgenv()._tp_cycle_count .. " done! Waiting " .. WAIT_AFTER_LAST .. "s")
+        
+        getgenv()._tp_cycle_waiting = true
+        getgenv()._tp_cycle_wait_start = tick()
+        getgenv()._tp_cycle_i = 1  -- Сбрасываем на первую точку
+    end
+end
+
+local function startCycle()
+    if getgenv()._tp_cycle_emergency then
+        print("⚠️ EMERGENCY STOP! Press F3 to reactivate")
+        return
+    end
+    if getgenv()._tp_cycle_running then return end
+    
+    getgenv()._tp_cycle_running = true
+    getgenv()._tp_cycle_i = 1
+    getgenv()._tp_cycle_tick = tick()
+    getgenv()._tp_cycle_waiting = false
+    getgenv()._tp_cycle_count = 0
+    print("==== CYCLE STARTED (" .. #points .. " points) ====")
+    print("⏳ Wait " .. WAIT_AFTER_LAST .. " seconds after point #" .. #points)
+    tpNext()
+    
+    if getgenv()._tp_cycle_connection then
+        getgenv()._tp_cycle_connection:Disconnect()
+    end
+    
+    getgenv()._tp_cycle_connection = game:GetService("RunService").Heartbeat:Connect(function()
+        if not getgenv()._tp_cycle_running or getgenv()._tp_cycle_emergency then
+            return
+        end
+        
+        -- Если в режиме ожидания
+        if getgenv()._tp_cycle_waiting then
+            if tick() - getgenv()._tp_cycle_wait_start >= WAIT_AFTER_LAST then
+                getgenv()._tp_cycle_waiting = false
+                print("✅ Wait finished! Starting new cycle...")
+                game:GetService("Chat"):Chat(game.Players.LocalPlayer.Character, "✅ Starting new cycle!")
+                tpNext()
+            end
+            return
+        end
+        
+        -- Обычный цикл
+        if tick() - getgenv()._tp_cycle_tick >= 1.0 then
+            getgenv()._tp_cycle_tick = tick()
+            tpNext()
+        end
+    end)
+end
+
+local function stopCycle()
+    if getgenv()._tp_cycle_emergency then
+        print("⚠️ EMERGENCY STOP! Press F3 to reactivate")
+        return
+    end
+    if not getgenv()._tp_cycle_running then return end
+    
+    getgenv()._tp_cycle_running = false
+    getgenv()._tp_cycle_waiting = false
+    if getgenv()._tp_cycle_connection then
+        getgenv()._tp_cycle_connection:Disconnect()
+        getgenv()._tp_cycle_connection = nil
+    end
+    print("==== CYCLE STOPPED ====")
+    print("Total cycles: " .. getgenv()._tp_cycle_count)
+end
+
+local function emergencyStop()
+    if getgenv()._tp_cycle_emergency then
+        getgenv()._tp_cycle_emergency = false
+        getgenv()._tp_cycle_running = false
+        getgenv()._tp_cycle_waiting = false
+        if getgenv()._tp_cycle_connection then
+            getgenv()._tp_cycle_connection:Disconnect()
+            getgenv()._tp_cycle_connection = nil
+        end
+        print("✅ SCRIPT REACTIVATED! Press F1 to start")
+        return
+    end
+    
+    getgenv()._tp_cycle_emergency = true
+    getgenv()._tp_cycle_running = false
+    getgenv()._tp_cycle_waiting = false
+    if getgenv()._tp_cycle_connection then
+        getgenv()._tp_cycle_connection:Disconnect()
+        getgenv()._tp_cycle_connection = nil
+    end
+    print("🚨 EMERGENCY STOP! Press F3 to reactivate")
+end
+
+-- Настройка клавиш
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.F1 then
+        startCycle()
+    elseif input.KeyCode == Enum.KeyCode.F2 then
+        stopCycle()
+    elseif input.KeyCode == Enum.KeyCode.F3 then
+        emergencyStop()
+    end
+end)
+
+print("==== XENO TP CYCLE ====")
+print("Total points: " .. #points)
+print("⏳ WAIT " .. WAIT_AFTER_LAST .. " seconds AFTER point #" .. #points)
+print("Then restarts from point #1")
+print("F1 - Start | F2 - Stop | F3 - Emergency")
+print("Press F1 to begin!")
