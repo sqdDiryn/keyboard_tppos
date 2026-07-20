@@ -1,1 +1,997 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game:GetService("CoreGui")
+
+local TRANSPARENCY = 0.2
+
+-- ОСНОВНОЕ МЕНЮ
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 320, 0, 440)
+mainFrame.Position = UDim2.new(0, 1600, 0, 520)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+mainFrame.BackgroundTransparency = TRANSPARENCY
+mainFrame.BorderSizePixel = 1
+mainFrame.BorderColor3 = Color3.fromRGB(80, 80, 100)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+mainFrame.ClipsDescendants = false
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = mainFrame
+
+local contentContainer = Instance.new("Frame")
+contentContainer.Size = UDim2.new(1, 0, 1, 0)
+contentContainer.BackgroundTransparency = 1
+contentContainer.Parent = mainFrame
+
+-- КНОПКА НАСТРОЕК (в левом нижнем углу)
+local settingsButton = Instance.new("TextButton")
+settingsButton.Size = UDim2.new(0, 40, 0, 40)
+settingsButton.Position = UDim2.new(0, 10, 1, -50)
+settingsButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120)
+settingsButton.BackgroundTransparency = TRANSPARENCY
+settingsButton.BorderSizePixel = 0
+settingsButton.Text = "⚙️"
+settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+settingsButton.TextSize = 22
+settingsButton.Font = Enum.Font.GothamBold
+settingsButton.Parent = mainFrame
+settingsButton.ZIndex = 10
+
+local settingsBtnCorner = Instance.new("UICorner")
+settingsBtnCorner.CornerRadius = UDim.new(1, 0)
+settingsBtnCorner.Parent = settingsButton
+
+settingsButton.MouseEnter:Connect(function()
+    settingsButton.BackgroundColor3 = Color3.fromRGB(100, 100, 150)
+    settingsButton.Size = UDim2.new(0, 42, 0, 42)
+    settingsButton.Position = UDim2.new(0, 9, 1, -51)
+end)
+
+settingsButton.MouseLeave:Connect(function()
+    settingsButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120)
+    settingsButton.Size = UDim2.new(0, 40, 0, 40)
+    settingsButton.Position = UDim2.new(0, 10, 1, -50)
+end)
+
+-- Кнопка закрытия
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 26, 0, 26)
+closeButton.Position = UDim2.new(1, -65, 0, 5)
+closeButton.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+closeButton.BackgroundTransparency = TRANSPARENCY
+closeButton.BorderSizePixel = 0
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+closeButton.TextSize = 16
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = mainFrame
+closeButton.ZIndex = 10
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(1, 0)
+closeCorner.Parent = closeButton
+
+closeButton.MouseEnter:Connect(function()
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    closeButton.BackgroundTransparency = TRANSPARENCY - 0.1
+    closeButton.Size = UDim2.new(0, 28, 0, 28)
+    closeButton.Position = UDim2.new(1, -66, 0, 4)
+end)
+
+closeButton.MouseLeave:Connect(function()
+    closeButton.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+    closeButton.BackgroundTransparency = TRANSPARENCY
+    closeButton.Size = UDim2.new(0, 26, 0, 26)
+    closeButton.Position = UDim2.new(1, -65, 0, 5)
+end)
+
+-- Кнопка сворачивания
+local arrowButton = Instance.new("TextButton")
+arrowButton.Size = UDim2.new(0, 26, 0, 26)
+arrowButton.Position = UDim2.new(1, -35, 0, 5)
+arrowButton.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+arrowButton.BackgroundTransparency = TRANSPARENCY
+arrowButton.BorderSizePixel = 0
+arrowButton.Text = "◀"
+arrowButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+arrowButton.TextSize = 16
+arrowButton.Font = Enum.Font.GothamBold
+arrowButton.Parent = mainFrame
+arrowButton.ZIndex = 10
+
+local arrowCorner = Instance.new("UICorner")
+arrowCorner.CornerRadius = UDim.new(0, 6)
+arrowCorner.Parent = arrowButton
+
+-- Заголовок
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -100, 0, 30)
+titleLabel.Position = UDim2.new(0, 15, 0, 2)
+titleLabel.BackgroundTransparency = 1
+titleLabel.BorderSizePixel = 0
+titleLabel.Text = "💎 ESP by sqdDiryn and egorkaig"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 13
+titleLabel.Font = Enum.Font.GothamSemibold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = mainFrame
+titleLabel.ZIndex = 5
+
+local settingsContainer = Instance.new("Frame")
+settingsContainer.Size = UDim2.new(1, -20, 0, 200)
+settingsContainer.Position = UDim2.new(0, 10, 0, 40)
+settingsContainer.BackgroundTransparency = 1
+settingsContainer.Parent = contentContainer
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(1, 0, 0, 35)
+toggleButton.Position = UDim2.new(0, 0, 0, 0)
+toggleButton.BackgroundColor3 = Color3.fromRGB(60, 200, 80)
+toggleButton.BackgroundTransparency = TRANSPARENCY
+toggleButton.BorderSizePixel = 0
+toggleButton.Text = "✅ ESP ВКЛ"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 14
+toggleButton.Font = Enum.Font.GothamSemibold
+toggleButton.Parent = settingsContainer
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 6)
+toggleCorner.Parent = toggleButton
+
+local rgbToggle = Instance.new("TextButton")
+rgbToggle.Size = UDim2.new(1, 0, 0, 35)
+rgbToggle.Position = UDim2.new(0, 0, 0, 42)
+rgbToggle.BackgroundColor3 = Color3.fromRGB(100, 50, 200)
+rgbToggle.BackgroundTransparency = TRANSPARENCY
+rgbToggle.BorderSizePixel = 0
+rgbToggle.Text = "🌈 RGB РЕЖИМ ВЫКЛ"
+rgbToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+rgbToggle.TextSize = 14
+rgbToggle.Font = Enum.Font.GothamSemibold
+rgbToggle.Parent = settingsContainer
+
+local rgbCorner = Instance.new("UICorner")
+rgbCorner.CornerRadius = UDim.new(0, 6)
+rgbCorner.Parent = rgbToggle
+
+local selfToggle = Instance.new("TextButton")
+selfToggle.Size = UDim2.new(0.48, 0, 0, 30)
+selfToggle.Position = UDim2.new(0, 0, 0, 84)
+selfToggle.BackgroundColor3 = Color3.fromRGB(60, 200, 80)
+selfToggle.BackgroundTransparency = TRANSPARENCY
+selfToggle.BorderSizePixel = 0
+selfToggle.Text = "👤 Себя"
+selfToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+selfToggle.TextSize = 13
+selfToggle.Font = Enum.Font.GothamSemibold
+selfToggle.Parent = settingsContainer
+
+local selfCorner = Instance.new("UICorner")
+selfCorner.CornerRadius = UDim.new(0, 6)
+selfCorner.Parent = selfToggle
+
+local othersToggle = Instance.new("TextButton")
+othersToggle.Size = UDim2.new(0.48, 0, 0, 30)
+othersToggle.Position = UDim2.new(0.52, 0, 0, 84)
+othersToggle.BackgroundColor3 = Color3.fromRGB(60, 200, 80)
+othersToggle.BackgroundTransparency = TRANSPARENCY
+othersToggle.BorderSizePixel = 0
+othersToggle.Text = "👥 Других"
+othersToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+othersToggle.TextSize = 13
+othersToggle.Font = Enum.Font.GothamSemibold
+othersToggle.Parent = settingsContainer
+
+local othersCorner = Instance.new("UICorner")
+othersCorner.CornerRadius = UDim.new(0, 6)
+othersCorner.Parent = othersToggle
+
+local namesToggle = Instance.new("TextButton")
+namesToggle.Size = UDim2.new(0.48, 0, 0, 30)
+namesToggle.Position = UDim2.new(0, 0, 0, 120)
+namesToggle.BackgroundColor3 = Color3.fromRGB(60, 200, 80)
+namesToggle.BackgroundTransparency = TRANSPARENCY
+namesToggle.BorderSizePixel = 0
+namesToggle.Text = "📝 Никнеймы"
+namesToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+namesToggle.TextSize = 13
+namesToggle.Font = Enum.Font.GothamSemibold
+namesToggle.Parent = settingsContainer
+
+local namesCorner = Instance.new("UICorner")
+namesCorner.CornerRadius = UDim.new(0, 6)
+namesCorner.Parent = namesToggle
+
+local clearColorButton = Instance.new("TextButton")
+clearColorButton.Size = UDim2.new(0.48, 0, 0, 30)
+clearColorButton.Position = UDim2.new(0.52, 0, 0, 120)
+clearColorButton.BackgroundColor3 = Color3.fromRGB(80, 80, 100)
+clearColorButton.BackgroundTransparency = TRANSPARENCY
+clearColorButton.BorderSizePixel = 0
+clearColorButton.Text = "🧹 Очистить цвет"
+clearColorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+clearColorButton.TextSize = 13
+clearColorButton.Font = Enum.Font.GothamSemibold
+clearColorButton.Parent = settingsContainer
+
+local clearCorner = Instance.new("UICorner")
+clearCorner.CornerRadius = UDim.new(0, 6)
+clearCorner.Parent = clearColorButton
+
+-- ===== ПАЛИТРА (ВНУТРИ ОСНОВНОГО МЕНЮ) =====
+local colorPickerFrame = Instance.new("Frame")
+colorPickerFrame.Size = UDim2.new(1, 0, 0, 190)
+colorPickerFrame.Position = UDim2.new(0, 0, 0, 208)
+colorPickerFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+colorPickerFrame.BackgroundTransparency = 1
+colorPickerFrame.BorderSizePixel = 0
+colorPickerFrame.Parent = contentContainer
+
+local ColorpickerHolder = Instance.new("Frame")
+ColorpickerHolder.Size = UDim2.new(1, -10, 1, -35)
+ColorpickerHolder.Position = UDim2.new(0, 5, 0, 5)
+ColorpickerHolder.BackgroundTransparency = 1
+ColorpickerHolder.Parent = colorPickerFrame
+
+local ColorpickerMain = Instance.new("Frame")
+ColorpickerMain.Size = UDim2.new(0, 200, 1, 0)
+ColorpickerMain.Position = UDim2.new(0.5, -100, 0, 0)
+ColorpickerMain.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ColorpickerMain.BackgroundTransparency = 0
+ColorpickerMain.BorderSizePixel = 0
+ColorpickerMain.Parent = ColorpickerHolder
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 4)
+MainCorner.Parent = ColorpickerMain
+
+local HueGradient = Instance.new("UIGradient")
+HueGradient.Rotation = 0
+HueGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+    ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+})
+HueGradient.Parent = ColorpickerMain
+
+local BrightnessOverlay = Instance.new("Frame")
+BrightnessOverlay.Size = UDim2.new(1, 0, 1, 0)
+BrightnessOverlay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+BrightnessOverlay.BackgroundTransparency = 0
+BrightnessOverlay.BorderSizePixel = 0
+BrightnessOverlay.Parent = ColorpickerMain
+
+local BGGradient = Instance.new("UIGradient")
+BGGradient.Rotation = 90
+BGGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+})
+BGGradient.Parent = BrightnessOverlay
+
+BGGradient.Transparency = NumberSequence.new({
+    NumberSequenceKeypoint.new(0, 0.7),
+    NumberSequenceKeypoint.new(1, 0)
+})
+
+local Cursor = Instance.new("Frame")
+Cursor.Size = UDim2.new(0, 10, 0, 10)
+Cursor.Position = UDim2.new(0, 0, 0, 0)
+Cursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Cursor.BackgroundTransparency = 0
+Cursor.BorderSizePixel = 2
+Cursor.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Cursor.ZIndex = 2
+Cursor.Parent = ColorpickerMain
+
+local CursorCorner = Instance.new("UICorner")
+CursorCorner.CornerRadius = UDim.new(1, 0)
+CursorCorner.Parent = Cursor
+
+local BrightnessSlider = Instance.new("Frame")
+BrightnessSlider.Size = UDim2.new(0, 20, 1, 0)
+BrightnessSlider.Position = UDim2.new(0.5, 112, 0, 0)
+BrightnessSlider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+BrightnessSlider.BackgroundTransparency = 0
+BrightnessSlider.Parent = ColorpickerHolder
+
+local SliderCorner = Instance.new("UICorner")
+SliderCorner.CornerRadius = UDim.new(0, 4)
+SliderCorner.Parent = BrightnessSlider
+
+local SliderGradient = Instance.new("UIGradient")
+SliderGradient.Rotation = 90
+SliderGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+})
+SliderGradient.Parent = BrightnessSlider
+
+local SliderCursor = Instance.new("Frame")
+SliderCursor.Size = UDim2.new(1.5, 0, 0, 8)
+SliderCursor.Position = UDim2.new(-0.25, 0, 0.5, -4)
+SliderCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SliderCursor.BackgroundTransparency = 0
+SliderCursor.BorderSizePixel = 2
+SliderCursor.BorderColor3 = Color3.fromRGB(0, 0, 0)
+SliderCursor.Parent = BrightnessSlider
+
+local SliderCursorCorner = Instance.new("UICorner")
+SliderCursorCorner.CornerRadius = UDim.new(0, 4)
+SliderCursorCorner.Parent = SliderCursor
+
+local colorDisplayLabel = Instance.new("TextLabel")
+colorDisplayLabel.Size = UDim2.new(0.5, 0, 0, 22)
+colorDisplayLabel.Position = UDim2.new(0.25, 0, 1, 2)
+colorDisplayLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+colorDisplayLabel.BackgroundTransparency = TRANSPARENCY
+colorDisplayLabel.BorderSizePixel = 1
+colorDisplayLabel.BorderColor3 = Color3.fromRGB(80, 80, 100)
+colorDisplayLabel.Text = "Белый"
+colorDisplayLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+colorDisplayLabel.TextSize = 11
+colorDisplayLabel.Font = Enum.Font.Gotham
+colorDisplayLabel.Parent = colorPickerFrame
+
+local colorDisplayCorner = Instance.new("UICorner")
+colorDisplayCorner.CornerRadius = UDim.new(0, 4)
+colorDisplayCorner.Parent = colorDisplayLabel
+
+-- ===== МЕНЮ НАСТРОЕК (СЛЕВА ОТ ОСНОВНОГО МЕНЮ) =====
+local settingsFrame = Instance.new("Frame")
+settingsFrame.Size = UDim2.new(0, 250, 0, 130)
+settingsFrame.Position = UDim2.new(0, 1600 - 10 - 250, 0, 520)
+settingsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+settingsFrame.BackgroundTransparency = TRANSPARENCY
+settingsFrame.BorderSizePixel = 1
+settingsFrame.BorderColor3 = Color3.fromRGB(80, 80, 100)
+settingsFrame.Active = true
+settingsFrame.Draggable = true
+settingsFrame.Parent = screenGui
+settingsFrame.Visible = false
+settingsFrame.ClipsDescendants = true
+
+local settingsFrameCorner = Instance.new("UICorner")
+settingsFrameCorner.CornerRadius = UDim.new(0, 12)
+settingsFrameCorner.Parent = settingsFrame
+
+-- Заголовок настроек
+local settingsTitle = Instance.new("TextLabel")
+settingsTitle.Size = UDim2.new(1, 0, 0, 30)
+settingsTitle.Position = UDim2.new(0, 0, 0, 0)
+settingsTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+settingsTitle.BackgroundTransparency = 0.2
+settingsTitle.BorderSizePixel = 0
+settingsTitle.Text = "⚙️ Настройки биндов"
+settingsTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+settingsTitle.TextSize = 14
+settingsTitle.Font = Enum.Font.GothamSemibold
+settingsTitle.Parent = settingsFrame
+
+-- Кнопка закрытия настроек
+local settingsClose = Instance.new("TextButton")
+settingsClose.Size = UDim2.new(0, 22, 0, 22)
+settingsClose.Position = UDim2.new(1, -26, 0, 4)
+settingsClose.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+settingsClose.BackgroundTransparency = TRANSPARENCY
+settingsClose.BorderSizePixel = 0
+settingsClose.Text = "X"
+settingsClose.TextColor3 = Color3.fromRGB(0, 0, 0)
+settingsClose.TextSize = 14
+settingsClose.Font = Enum.Font.GothamBold
+settingsClose.Parent = settingsFrame
+
+local settingsCloseCorner = Instance.new("UICorner")
+settingsCloseCorner.CornerRadius = UDim.new(1, 0)
+settingsCloseCorner.Parent = settingsClose
+
+settingsClose.MouseEnter:Connect(function()
+    settingsClose.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    settingsClose.BackgroundTransparency = TRANSPARENCY - 0.1
+    settingsClose.Size = UDim2.new(0, 24, 0, 24)
+    settingsClose.Position = UDim2.new(1, -27, 0, 3)
+end)
+
+settingsClose.MouseLeave:Connect(function()
+    settingsClose.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+    settingsClose.BackgroundTransparency = TRANSPARENCY
+    settingsClose.Size = UDim2.new(0, 22, 0, 22)
+    settingsClose.Position = UDim2.new(1, -26, 0, 4)
+end)
+
+-- Контейнер для настроек
+local settingsContent = Instance.new("Frame")
+settingsContent.Size = UDim2.new(1, -20, 1, -40)
+settingsContent.Position = UDim2.new(0, 10, 0, 35)
+settingsContent.BackgroundTransparency = 1
+settingsContent.Parent = settingsFrame
+
+-- Bind ESP
+local bindESPLabel = Instance.new("TextLabel")
+bindESPLabel.Size = UDim2.new(1, 0, 0, 25)
+bindESPLabel.Position = UDim2.new(0, 0, 0, 0)
+bindESPLabel.BackgroundTransparency = 1
+bindESPLabel.Text = "Bind ESP: None"
+bindESPLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+bindESPLabel.TextSize = 14
+bindESPLabel.Font = Enum.Font.GothamSemibold
+bindESPLabel.TextXAlignment = Enum.TextXAlignment.Left
+bindESPLabel.Parent = settingsContent
+
+local bindESPButton = Instance.new("TextButton")
+bindESPButton.Size = UDim2.new(0.35, 0, 0, 24)
+bindESPButton.Position = UDim2.new(0.65, 0, 0, 0)
+bindESPButton.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+bindESPButton.BackgroundTransparency = TRANSPARENCY
+bindESPButton.BorderSizePixel = 0
+bindESPButton.Text = "Назначить"
+bindESPButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+bindESPButton.TextSize = 12
+bindESPButton.Font = Enum.Font.GothamSemibold
+bindESPButton.Parent = settingsContent
+
+local bindESPCorner = Instance.new("UICorner")
+bindESPCorner.CornerRadius = UDim.new(0, 6)
+bindESPCorner.Parent = bindESPButton
+
+bindESPButton.MouseEnter:Connect(function()
+    bindESPButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120)
+    bindESPButton.BackgroundTransparency = TRANSPARENCY - 0.1
+end)
+
+bindESPButton.MouseLeave:Connect(function()
+    bindESPButton.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+    bindESPButton.BackgroundTransparency = TRANSPARENCY
+end)
+
+-- Bind Hide
+local bindHideLabel = Instance.new("TextLabel")
+bindHideLabel.Size = UDim2.new(1, 0, 0, 25)
+bindHideLabel.Position = UDim2.new(0, 0, 0, 35)
+bindHideLabel.BackgroundTransparency = 1
+bindHideLabel.Text = "Bind Hide: None"
+bindHideLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+bindHideLabel.TextSize = 14
+bindHideLabel.Font = Enum.Font.GothamSemibold
+bindHideLabel.TextXAlignment = Enum.TextXAlignment.Left
+bindHideLabel.Parent = settingsContent
+
+local bindHideButton = Instance.new("TextButton")
+bindHideButton.Size = UDim2.new(0.35, 0, 0, 24)
+bindHideButton.Position = UDim2.new(0.65, 0, 0, 35)
+bindHideButton.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+bindHideButton.BackgroundTransparency = TRANSPARENCY
+bindHideButton.BorderSizePixel = 0
+bindHideButton.Text = "Назначить"
+bindHideButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+bindHideButton.TextSize = 12
+bindHideButton.Font = Enum.Font.GothamSemibold
+bindHideButton.Parent = settingsContent
+
+local bindHideCorner = Instance.new("UICorner")
+bindHideCorner.CornerRadius = UDim.new(0, 6)
+bindHideCorner.Parent = bindHideButton
+
+bindHideButton.MouseEnter:Connect(function()
+    bindHideButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120)
+    bindHideButton.BackgroundTransparency = TRANSPARENCY - 0.1
+end)
+
+bindHideButton.MouseLeave:Connect(function()
+    bindHideButton.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+    bindHideButton.BackgroundTransparency = TRANSPARENCY
+end)
+
+-- ПЕРЕМЕННЫЕ
+local CurrentColor = Color3.fromRGB(255, 255, 255)
+local showNames = true
+local dragging = false
+local draggingSlider = false
+local espEnabled = true
+local showSelf = true
+local showOthers = true
+local espObjects = {}
+local isCollapsed = false
+local playersProcessing = {}
+local isScriptActive = true
+local rgbMode = false
+local rgbConnection = nil
+local savedPosition = UDim2.new(0, 1600, 0, 520)
+local bindESP = nil
+local bindHide = nil
+local waitingForBind = false
+local bindType = nil
+local settingsVisible = false
+
+local connections = {}
+
+-- Функция обновления позиции настроек (СЛЕВА)
+local function UpdateSettingsPosition()
+    if not isScriptActive then return end
+    local mainX = mainFrame.Position.X.Offset
+    local mainY = mainFrame.Position.Y.Offset
+    settingsFrame.Position = UDim2.new(0, mainX - 10 - 250, 0, mainY)
+end
+
+-- Функции биндов
+local function StartBind(type)
+    waitingForBind = true
+    bindType = type
+    if type == "ESP" then
+        bindESPButton.Text = "..."
+    elseif type == "Hide" then
+        bindHideButton.Text = "..."
+    end
+end
+
+local function SetBind(key)
+    waitingForBind = false
+    if bindType == "ESP" then
+        bindESP = key
+        bindESPButton.Text = "Назначить"
+        bindESPLabel.Text = "Bind ESP: " .. key.Name
+    elseif bindType == "Hide" then
+        bindHide = key
+        bindHideButton.Text = "Назначить"
+        bindHideLabel.Text = "Bind Hide: " .. key.Name
+    end
+    bindType = nil
+end
+
+-- НАЗНАЧЕНИЕ БИНДОВ
+bindESPButton.MouseButton1Click:Connect(function()
+    if not isScriptActive then return end
+    StartBind("ESP")
+end)
+
+bindHideButton.MouseButton1Click:Connect(function()
+    if not isScriptActive then return end
+    StartBind("Hide")
+end)
+
+-- ОБРАБОТЧИК КЛАВИШ
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if waitingForBind and input.UserInputType == Enum.UserInputType.Keyboard then
+        SetBind(input.KeyCode)
+        return
+    end
+    if bindESP and input.KeyCode == bindESP then
+        espEnabled = not espEnabled
+        toggleButton.Text = espEnabled and "✅ ESP ВКЛ" or "❌ ESP ВЫКЛ"
+        toggleButton.BackgroundColor3 = espEnabled and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(200, 60, 60)
+        for player, objects in pairs(espObjects) do
+            local isSelf = (player == LocalPlayer)
+            local visible = espEnabled and ((isSelf and showSelf) or (not isSelf and showOthers))
+            if objects.Highlight then objects.Highlight.Enabled = visible end
+            if objects.Billboard then objects.Billboard.Enabled = visible and showNames end
+        end
+    end
+    if bindHide and input.KeyCode == bindHide then
+        toggleCollapse()
+    end
+end)
+
+local function UpdateColorDisplay()
+    if not isScriptActive then return end
+    if rgbMode then
+        colorDisplayLabel.Text = "🌈 RGB Режим"
+        colorDisplayLabel.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
+        colorDisplayLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        return
+    end
+    
+    local colorName = "Белый"
+    if CurrentColor == Color3.fromRGB(255, 0, 0) then colorName = "Красный"
+    elseif CurrentColor == Color3.fromRGB(0, 255, 0) then colorName = "Зелёный"
+    elseif CurrentColor == Color3.fromRGB(0, 0, 255) then colorName = "Синий"
+    elseif CurrentColor == Color3.fromRGB(255, 255, 0) then colorName = "Жёлтый"
+    elseif CurrentColor == Color3.fromRGB(255, 0, 255) then colorName = "Пурпурный"
+    elseif CurrentColor == Color3.fromRGB(0, 255, 255) then colorName = "Голубой"
+    elseif CurrentColor == Color3.fromRGB(255, 255, 255) then colorName = "Белый"
+    elseif CurrentColor == Color3.fromRGB(0, 0, 0) then colorName = "Чёрный"
+    else
+        local r = math.round(CurrentColor.R * 255)
+        local g = math.round(CurrentColor.G * 255)
+        local b = math.round(CurrentColor.B * 255)
+        colorName = string.format("RGB(%d, %d, %d)", r, g, b)
+    end
+    
+    colorDisplayLabel.Text = colorName
+    colorDisplayLabel.BackgroundColor3 = CurrentColor
+    colorDisplayLabel.TextColor3 = (CurrentColor.R < 0.5 and CurrentColor.G < 0.5 and CurrentColor.B < 0.5) and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(0, 0, 0)
+end
+
+local function ResetColorToWhite()
+    if not isScriptActive or rgbMode then return end
+    CurrentColor = Color3.fromRGB(255, 255, 255)
+    Cursor.Position = UDim2.new(0, -5, 0, -5)
+    SliderCursor.Position = UDim2.new(-0.25, 0, 0, -4)
+    UpdateColorDisplay()
+    updateESPColor()
+end
+
+local function GetColorFromPosition(X, Y, SizeX, SizeY)
+    return Color3.fromHSV(X / SizeX, 1, 1 - (Y / SizeY))
+end
+
+local function UpdateColor(Input)
+    if not isScriptActive or rgbMode then return end
+    local Position = Input.Position
+    local AbsolutePosition = ColorpickerMain.AbsolutePosition
+    local Size = ColorpickerMain.AbsoluteSize
+    local X = math.clamp(Position.X - AbsolutePosition.X, 0, Size.X)
+    local Y = math.clamp(Position.Y - AbsolutePosition.Y, 0, Size.Y)
+    Cursor.Position = UDim2.new(0, X - 5, 0, Y - 5)
+    CurrentColor = GetColorFromPosition(X, Y, Size.X, Size.Y)
+    UpdateColorDisplay()
+    updateESPColor()
+end
+
+local function UpdateSlider(Input)
+    if not isScriptActive or rgbMode then return end
+    local Position = Input.Position
+    local AbsolutePosition = BrightnessSlider.AbsolutePosition
+    local Size = BrightnessSlider.AbsoluteSize
+    local Y = math.clamp(Position.Y - AbsolutePosition.Y, 0, Size.Y)
+    SliderCursor.Position = UDim2.new(-0.25, 0, 0, Y - 4)
+    local H, S, V = CurrentColor:ToHSV()
+    CurrentColor = Color3.fromHSV(H, S, 1 - (Y / Size.Y))
+    UpdateColorDisplay()
+    updateESPColor()
+end
+
+local function UpdateRGBColors()
+    if not isScriptActive or not rgbMode then return end
+    local color = Color3.fromHSV(tick() % 1, 1, 1)
+    for player, objects in pairs(espObjects) do
+        if objects.Highlight then
+            objects.Highlight.OutlineColor = color
+            objects.Highlight.FillColor = color
+        end
+        if objects.NameLabel and player ~= LocalPlayer then
+            objects.NameLabel.TextColor3 = color
+        end
+    end
+end
+
+local function ToggleRGBMode()
+    if not isScriptActive then return end
+    rgbMode = not rgbMode
+    if rgbMode then
+        rgbToggle.Text = "🌈 RGB РЕЖИМ ВКЛ"
+        rgbToggle.BackgroundColor3 = Color3.fromRGB(200, 50, 100)
+        colorDisplayLabel.Text = "🌈 RGB Режим"
+        colorDisplayLabel.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
+        colorDisplayLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        if rgbConnection then rgbConnection:Disconnect() end
+        rgbConnection = RunService.RenderStepped:Connect(UpdateRGBColors)
+    else
+        rgbToggle.Text = "🌈 RGB РЕЖИМ ВЫКЛ"
+        rgbToggle.BackgroundColor3 = Color3.fromRGB(100, 50, 200)
+        if rgbConnection then
+            rgbConnection:Disconnect()
+            rgbConnection = nil
+        end
+        UpdateColorDisplay()
+        updateESPColor()
+    end
+end
+
+table.insert(connections, ColorpickerMain.InputBegan:Connect(function(Input)
+    if not isScriptActive then return end
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        UpdateColor(Input)
+        mainFrame.Active = false
+    end
+end))
+
+table.insert(connections, ColorpickerMain.InputChanged:Connect(function(Input)
+    if not isScriptActive then return end
+    if dragging and Input.UserInputType == Enum.UserInputType.MouseMovement then
+        UpdateColor(Input)
+        mainFrame.Active = false
+    end
+end))
+
+table.insert(connections, ColorpickerMain.InputEnded:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+        mainFrame.Active = true
+    end
+end))
+
+table.insert(connections, BrightnessSlider.InputBegan:Connect(function(Input)
+    if not isScriptActive then return end
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingSlider = true
+        UpdateSlider(Input)
+        mainFrame.Active = false
+    end
+end))
+
+table.insert(connections, BrightnessSlider.InputChanged:Connect(function(Input)
+    if not isScriptActive then return end
+    if draggingSlider and Input.UserInputType == Enum.UserInputType.MouseMovement then
+        UpdateSlider(Input)
+        mainFrame.Active = false
+    end
+end))
+
+table.insert(connections, BrightnessSlider.InputEnded:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingSlider = false
+        mainFrame.Active = true
+    end
+end))
+
+table.insert(connections, clearColorButton.MouseButton1Click:Connect(ResetColorToWhite))
+table.insert(connections, rgbToggle.MouseButton1Click:Connect(ToggleRGBMode))
+
+-- Функция полного удаления ESP
+local function DestroyAllESP()
+    for player, objects in pairs(espObjects) do
+        if objects.Highlight then objects.Highlight:Destroy() end
+        if objects.Billboard then objects.Billboard:Destroy() end
+    end
+    espObjects = {}
+    playersProcessing = {}
+end
+
+-- ПОЛНАЯ ВЫГРУЗКА
+local function ShutdownScript()
+    if not isScriptActive then return end
+    isScriptActive = false
+    if rgbConnection then
+        rgbConnection:Disconnect()
+        rgbConnection = nil
+    end
+    DestroyAllESP()
+    for _, connection in ipairs(connections) do
+        connection:Disconnect()
+    end
+    connections = {}
+    screenGui:Destroy()
+    print("💎 ESP полностью выгружен")
+end
+
+table.insert(connections, closeButton.MouseButton1Click:Connect(ShutdownScript))
+
+function updateESPColor()
+    if not isScriptActive or rgbMode then return end
+    for player, objects in pairs(espObjects) do
+        if objects.Highlight then
+            objects.Highlight.OutlineColor = CurrentColor
+            objects.Highlight.FillColor = CurrentColor
+        end
+        if objects.NameLabel and player ~= LocalPlayer then
+            objects.NameLabel.TextColor3 = CurrentColor
+        end
+        updateVisibility(player)
+    end
+end
+
+function toggleCollapse()
+    if not isScriptActive then return end
+    isCollapsed = not isCollapsed
+    
+    local targetSize
+    local targetPos
+    
+    if isCollapsed then
+        targetSize = UDim2.new(0, 320, 0, 35)
+        targetPos = UDim2.new(0, 1599, 0, 925)
+    else
+        targetSize = UDim2.new(0, 320, 0, 440)
+        targetPos = savedPosition
+    end
+    
+    contentContainer.Visible = not isCollapsed
+    settingsButton.Visible = not isCollapsed -- Скрываем кнопку настроек при сворачивании
+    arrowButton.Text = isCollapsed and "▶" or "◀"
+    
+    TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = targetSize}):Play()
+    TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+end
+
+table.insert(connections, arrowButton.MouseButton1Click:Connect(toggleCollapse))
+
+mainFrame:GetPropertyChangedSignal("Position"):Connect(function()
+    if not isCollapsed then
+        savedPosition = mainFrame.Position
+    end
+    if settingsVisible then
+        UpdateSettingsPosition()
+    end
+end)
+
+-- Настройки
+settingsButton.MouseButton1Click:Connect(function()
+    if not isScriptActive then return end
+    if settingsVisible then
+        settingsFrame.Visible = false
+        settingsVisible = false
+    else
+        UpdateSettingsPosition()
+        settingsFrame.Visible = true
+        settingsVisible = true
+    end
+end)
+
+settingsClose.MouseButton1Click:Connect(function()
+    settingsFrame.Visible = false
+    settingsVisible = false
+end)
+
+function createESP(player)
+    if not isScriptActive or playersProcessing[player] then return end
+    playersProcessing[player] = true
+    local character = player.Character
+    if not character then playersProcessing[player] = nil return end
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then playersProcessing[player] = nil return end
+    
+    removeESP(player)
+    
+    local color = rgbMode and Color3.fromHSV(tick() % 1, 1, 1) or CurrentColor
+    
+    local highlight = Instance.new("Highlight")
+    highlight.Parent = character
+    highlight.FillColor = color
+    highlight.FillTransparency = 1
+    highlight.OutlineColor = color
+    highlight.OutlineTransparency = 0
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    
+    local billboard = Instance.new("BillboardGui")
+    billboard.Parent = humanoidRootPart
+    billboard.Size = UDim2.new(0, 200, 0, 40)
+    billboard.Adornee = humanoidRootPart
+    billboard.AlwaysOnTop = true
+    billboard.StudsOffset = Vector3.new(0, 3.5, 0)
+    
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Parent = billboard
+    nameLabel.Size = UDim2.new(1, 0, 1, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = player.Name
+    nameLabel.TextColor3 = color
+    nameLabel.TextSize = 14
+    nameLabel.Font = Enum.Font.GothamBold
+    nameLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    nameLabel.TextStrokeTransparency = 0.3
+    
+    if player == LocalPlayer then
+        nameLabel.Text = player.Name .. " (ВЫ)"
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+    end
+    
+    espObjects[player] = {Highlight = highlight, Billboard = billboard, NameLabel = nameLabel}
+    updateVisibility(player)
+    playersProcessing[player] = nil
+end
+
+function updateVisibility(player)
+    if not isScriptActive then return end
+    local objects = espObjects[player]
+    if not objects then return end
+    local isSelf = (player == LocalPlayer)
+    local visible = espEnabled and ((isSelf and showSelf) or (not isSelf and showOthers))
+    if objects.Highlight then objects.Highlight.Enabled = visible end
+    if objects.Billboard then objects.Billboard.Enabled = visible and showNames end
+end
+
+function removeESP(player)
+    if espObjects[player] then
+        if espObjects[player].Highlight then espObjects[player].Highlight:Destroy() end
+        if espObjects[player].Billboard then espObjects[player].Billboard:Destroy() end
+        espObjects[player] = nil
+    end
+    playersProcessing[player] = nil
+end
+
+function updateAllVisibility()
+    if not isScriptActive then return end
+    for player, _ in pairs(espObjects) do
+        updateVisibility(player)
+    end
+end
+
+function updateAllNames()
+    if not isScriptActive then return end
+    for player, objects in pairs(espObjects) do
+        if objects.Billboard then
+            local isSelf = (player == LocalPlayer)
+            local visible = espEnabled and ((isSelf and showSelf) or (not isSelf and showOthers))
+            objects.Billboard.Enabled = visible and showNames
+        end
+    end
+end
+
+local function setupCharacterHandler(player)
+    if not isScriptActive then return end
+    local conn = player.CharacterAdded:Connect(function()
+        if not isScriptActive then conn:Disconnect() return end
+        task.wait(0.5)
+        if espEnabled then createESP(player) end
+    end)
+    table.insert(connections, conn)
+end
+
+table.insert(connections, toggleButton.MouseButton1Click:Connect(function()
+    if not isScriptActive then return end
+    espEnabled = not espEnabled
+    toggleButton.Text = espEnabled and "✅ ESP ВКЛ" or "❌ ESP ВЫКЛ"
+    toggleButton.BackgroundColor3 = espEnabled and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(200, 60, 60)
+    for player, objects in pairs(espObjects) do
+        local isSelf = (player == LocalPlayer)
+        local visible = espEnabled and ((isSelf and showSelf) or (not isSelf and showOthers))
+        if objects.Highlight then objects.Highlight.Enabled = visible end
+        if objects.Billboard then objects.Billboard.Enabled = visible and showNames end
+    end
+end))
+
+table.insert(connections, selfToggle.MouseButton1Click:Connect(function()
+    if not isScriptActive then return end
+    showSelf = not showSelf
+    selfToggle.BackgroundColor3 = showSelf and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(200, 60, 60)
+    selfToggle.Text = showSelf and "👤 Себя" or "👤 Скрыть"
+    updateAllVisibility()
+    if showSelf and espEnabled and not espObjects[LocalPlayer] then
+        createESP(LocalPlayer)
+    end
+end))
+
+table.insert(connections, othersToggle.MouseButton1Click:Connect(function()
+    if not isScriptActive then return end
+    showOthers = not showOthers
+    othersToggle.BackgroundColor3 = showOthers and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(200, 60, 60)
+    othersToggle.Text = showOthers and "👥 Других" or "👥 Скрыть"
+    updateAllVisibility()
+end))
+
+table.insert(connections, namesToggle.MouseButton1Click:Connect(function()
+    if not isScriptActive then return end
+    showNames = not showNames
+    namesToggle.BackgroundColor3 = showNames and Color3.fromRGB(60, 200, 80) or Color3.fromRGB(200, 60, 60)
+    namesToggle.Text = showNames and "📝 Никнеймы" or "📝 Скрыть ники"
+    updateAllNames()
+end))
+
+local playerAddedConn = Players.PlayerAdded:Connect(function(player)
+    if not isScriptActive then playerAddedConn:Disconnect() return end
+    task.wait(0.5)
+    if espEnabled then createESP(player) end
+    setupCharacterHandler(player)
+end)
+table.insert(connections, playerAddedConn)
+
+local playerRemovingConn = Players.PlayerRemoving:Connect(function(player)
+    if not isScriptActive then playerRemovingConn:Disconnect() return end
+    removeESP(player)
+end)
+table.insert(connections, playerRemovingConn)
+
+task.wait(0.5)
+for _, player in ipairs(Players:GetPlayers()) do
+    createESP(player)
+    setupCharacterHandler(player)
+end
+
+UpdateColorDisplay()
+
+print("💎 ESP | By sqdDiryn and egorkaig")
